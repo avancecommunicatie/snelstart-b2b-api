@@ -1,0 +1,20 @@
+{
+    "name": "avancecommunicatie/SnelstartB2BApi",
+    "authors": [
+        {
+            "name": "Mark Paap",
+            "email": "mpaap@avancecommunicatie.nl"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Snelstart\\": "src/Snelstart/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
