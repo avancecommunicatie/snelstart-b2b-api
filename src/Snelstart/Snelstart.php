@@ -15,7 +15,7 @@ class Snelstart
     protected $api_key;
     protected $access_token;
 
-    public function generateAccessToken($connection_key, $api_key)
+    public function generateAccessToken($connection_key)
     {
         $this->setUsernameAndPassword($connection_key);
 
