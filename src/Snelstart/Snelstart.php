@@ -10,8 +10,6 @@ class Snelstart
 {
     protected $path = 'https://b2bapi.snelstart.nl/v1/';
     protected $authPath = 'https://auth.snelstart.nl/b2b/token';
-    protected $username;
-    protected $password;
     protected $apiKey;
     protected $accessToken;
 
@@ -22,36 +20,29 @@ class Snelstart
      */
     public function generateAccessToken(string $connectionKey): Snelstart
     {
-        $this->setUsernameAndPassword($connectionKey);
-
-        $client = new Client();
-
-        $headers = [
-            'Content-Type' => 'application/x-www-form-urlencoded'
-        ];
-        $body = "grant_type=password&username={$this->username}&password={$this->password}";
-
-        $request = new Request('POST', $this->authPath, $headers, $body);
-        $response = $response = $client->send($request, ['timeout' => 15]);
+        $response = (new Client())->send(
+            new Request('POST', $this->authPath),
+            [
+                'timeout' => 60,
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+                'form_params' => [
+                    'grant_type' => 'clientkey',
+                    'clientkey' => $connectionKey,
+                ]
+            ]
+        );
         $data = json_decode($response->getBody(), true);
         $this->setAccessToken($data['access_token']);
 
         return $this;
     }
 
-    protected function setUsernameAndPassword(string $connectionKey): void
-    {
-        [$username, $password] = explode(':', base64_decode($connectionKey));
-
-        $this->username = urlencode($username);
-        $this->password = urlencode($password);
-    }
-
     public function send(string $uri, string $method = 'GET', string $body = null)
     {
-        $client = new Client();
         $request = new Request($method, $this->path . $uri, $this->headers(), $body);
-        $response = $response = $client->send($request, ['timeout' => 60]);
+        $response = (new Client())->send($request, ['timeout' => 60]);
         return json_decode($response->getBody()->getContents(), 1);
     }
 
