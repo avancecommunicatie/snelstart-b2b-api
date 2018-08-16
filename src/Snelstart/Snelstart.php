@@ -9,15 +9,20 @@ use Snelstart\Exceptions\SnelstartException;
 class Snelstart
 {
     protected $path = 'https://b2bapi.snelstart.nl/v1/';
-    protected $auth_path = 'https://auth.snelstart.nl/b2b/token';
+    protected $authPath = 'https://auth.snelstart.nl/b2b/token';
     protected $username;
     protected $password;
-    protected $api_key;
-    protected $access_token;
+    protected $apiKey;
+    protected $accessToken;
 
-    public function generateAccessToken($connection_key)
+    /**
+     * @param string $connectionKey
+     * @return Snelstart
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function generateAccessToken(string $connectionKey): Snelstart
     {
-        $this->setUsernameAndPassword($connection_key);
+        $this->setUsernameAndPassword($connectionKey);
 
         $client = new Client();
 
@@ -26,65 +31,65 @@ class Snelstart
         ];
         $body = "grant_type=password&username={$this->username}&password={$this->password}";
 
-        $request = new Request('POST', $this->auth_path, $headers, $body);
+        $request = new Request('POST', $this->authPath, $headers, $body);
         $response = $response = $client->send($request, ['timeout' => 15]);
         $data = json_decode($response->getBody(), true);
-
-        if (!empty($data['access_token'])) {
-            $this->setAccessToken($data['access_token']);
-        }
+        $this->setAccessToken($data['access_token']);
 
         return $this;
     }
 
-    protected function setUsernameAndPassword($connection_key)
+    protected function setUsernameAndPassword(string $connectionKey): void
     {
-        list($username, $password) = explode(':', base64_decode($connection_key));
+        [$username, $password] = explode(':', base64_decode($connectionKey));
 
         $this->username = urlencode($username);
         $this->password = urlencode($password);
     }
 
-    public function send($uri, $method = 'GET', $body = null)
+    public function send(string $uri, string $method = 'GET', string $body = null)
     {
         $client = new Client();
-        $request = new Request($method, $this->path.$uri, $this->headers(), $body);
+        $request = new Request($method, $this->path . $uri, $this->headers(), $body);
         $response = $response = $client->send($request, ['timeout' => 60]);
         return json_decode($response->getBody()->getContents(), 1);
     }
 
-    protected function headers()
+    /** @throws SnelstartException */
+    protected function headers(): array
     {
         return [
             'Content-Type' => 'application/json',
             'Ocp-Apim-Subscription-Key' => $this->getApiKey(),
-            'Authorization' => 'Bearer '.$this->getAccessToken()
+            'Authorization' => 'Bearer ' . $this->getAccessToken()
         ];
     }
 
+    /** @throws SnelstartException */
     public function getApiKey()
     {
-        if (!$this->api_key) {
-            throw new SnelstartException("ApiKey required.", 400);
+        if (!$this->apiKey) {
+            throw new SnelstartException('ApiKey required.', 400);
         }
-        return $this->api_key;
+        return $this->apiKey;
     }
 
-    public function setApiKey($api_key)
+    public function setApiKey(string $apiKey): void
     {
-        $this->api_key = $api_key;
+        $this->apiKey = $apiKey;
     }
 
+    /** @throws SnelstartException */
     public function getAccessToken()
     {
-        if (!$this->access_token) {
-            throw new SnelstartException("Generate AccessToken first.", 400);
+        if (!$this->accessToken) {
+            throw new SnelstartException('Generate AccessToken first.', 400);
         }
-        return $this->access_token;
+        return $this->accessToken;
     }
 
-    public function setAccessToken($access_token)
+    public function setAccessToken(string $accessToken): void
     {
-        $this->access_token = $access_token;
+        $this->accessToken = $accessToken;
     }
 }
