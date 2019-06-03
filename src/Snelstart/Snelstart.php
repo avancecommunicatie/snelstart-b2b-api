@@ -8,7 +8,7 @@ use Snelstart\Exceptions\SnelstartException;
 
 class Snelstart
 {
-    protected $path = 'https://b2bapi.snelstart.nl/v1/';
+    protected $path = 'https://b2bapi.snelstart.nl/v2/';
     protected $authPath = 'https://auth.snelstart.nl/b2b/token';
     protected $apiKey;
     protected $accessToken;
