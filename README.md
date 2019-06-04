@@ -1,4 +1,7 @@
 # Snelstart B2B API
+
+For snelstart api version 1 use tag v0.0.5.
+
 Snelstart api PHP wrapper class
 
 `composer require avancecommunicatie/snelstart-b2b-api`
